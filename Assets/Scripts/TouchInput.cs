@@ -5,13 +5,19 @@ public class TouchInput : MonoBehaviour {
 
     public Vector2 startPos;
     public Vector2 endPos;
-    public PlayerMovement player;
+    public PlayerMovement[] cubes;
+    bool isTouched;
+
+    void Start()
+    {
+        cubes = (PlayerMovement[])FindObjectsOfType(typeof(PlayerMovement));
+    }
 
     void Update()
     {
 
-        if (player == null)
-            player = GameObject.Find("Player").GetComponent<PlayerMovement>();
+        if (cubes == null)
+            cubes = (PlayerMovement[])FindObjectsOfType(typeof(PlayerMovement));
 
         if (Application.isEditor)
         {
@@ -19,6 +25,7 @@ public class TouchInput : MonoBehaviour {
             {
                 startPos = Input.mousePosition;
                 endPos = Input.mousePosition;
+                isTouched = false;
             }
             if (Input.GetMouseButton(0))
             {
@@ -26,21 +33,42 @@ public class TouchInput : MonoBehaviour {
             }
             if (Input.GetMouseButtonUp(0))
             {
-                if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50)
+              
+                if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50 && !isTouched)
                 {
-                    player.MovePlayer("forward");
+                    foreach (PlayerMovement cube in cubes)
+                        cube.MovePlayer("forward");
+                    isTouched = true;
                 }
-                if (startPos.x - endPos.x < -100 && startPos.y - endPos.y > 50)
+                if (startPos.x - endPos.x < -100 && startPos.y - endPos.y > 50 && !isTouched)
                 {
-                    player.MovePlayer("back");
+                    foreach(PlayerMovement cube in cubes)
+                    cube.MovePlayer("back");
+                    isTouched = true;
                 }
-                if (startPos.x - endPos.x < -100 && startPos.y - endPos.y < -50)
+                if (startPos.x - endPos.x < -100 && startPos.y - endPos.y < -50 && !isTouched)
                 {
-                    player.MovePlayer("right");
+                    foreach (PlayerMovement cube in cubes)
+                        cube.MovePlayer("right");
+                    isTouched = true;
                 }
-                if (startPos.x - endPos.x > 100 && startPos.y - endPos.y > 50)
+                if (startPos.x - endPos.x > 100 && startPos.y - endPos.y > 50 && !isTouched)
                 {
-                    player.MovePlayer("left");
+                    foreach (PlayerMovement cube in cubes)
+                        cube.MovePlayer("left");
+                    isTouched = true;
+                }
+                if (startPos.y - endPos.y < -100 && !isTouched)
+                {
+                    foreach (PlayerMovement cube in cubes)
+                        cube.MoveUp();
+                    isTouched = true;
+                }
+                if (startPos.y - endPos.y > 100 && !isTouched)
+                {
+                    foreach (PlayerMovement cube in cubes)
+                        cube.MoveDown();
+                    isTouched = true;
                 }
             }
         }
@@ -54,6 +82,7 @@ public class TouchInput : MonoBehaviour {
                 {
                     startPos = touch.position;
                     endPos = touch.position;
+                    isTouched = false;
                 }
                 if (touch.phase == TouchPhase.Moved)
                 {
@@ -61,25 +90,47 @@ public class TouchInput : MonoBehaviour {
                 }
                 if (touch.phase == TouchPhase.Ended)
                 {
-                    if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50)
+                    
+                    if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50 && !isTouched)
                     {
-                        player.MovePlayer("forward");
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MovePlayer("forward");
+                        isTouched = true;
                     }
-                    if (startPos.x - endPos.x < -100 && startPos.y - endPos.y > 50)
+                    if (startPos.x - endPos.x < -100 && startPos.y - endPos.y > 50 && !isTouched)
                     {
-                        player.MovePlayer("back");
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MovePlayer("back");
+                        isTouched = true;
                     }
-                    if (startPos.x - endPos.x < -100 && startPos.y - endPos.y < -50)
+                    if (startPos.x - endPos.x < -100 && startPos.y - endPos.y < -50 && !isTouched)
                     {
-                        player.MovePlayer("right");
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MovePlayer("right");
+                        isTouched = true;
                     }
-                    if (startPos.x - endPos.x > 100 && startPos.y - endPos.y > 50)
+                    if (startPos.x - endPos.x > 100 && startPos.y - endPos.y > 50 && !isTouched)
                     {
-                        player.MovePlayer("left");
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MovePlayer("left");
+                        isTouched = true;
+                    }
+                    if (startPos.y - endPos.y < -100 && !isTouched)
+                    {
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MoveUp();
+                        isTouched = true;
+                    }
+                    if (startPos.y - endPos.y > 100 && !isTouched)
+                    {
+                        foreach (PlayerMovement cube in cubes)
+                            cube.MoveDown();
+                        isTouched = true;
                     }
                 }
             }
 
         }
     }
+    
 }

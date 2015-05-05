@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour {
     public float tArrowsMax;
     public float tArrows;
     public bool isPlaced;
-    RaycastHit hit;
+    RaycastHit Dhit;
 
     //Collider Arrays
     Collider[] Rcolliders, Dcolliders, LColliders, FColliders, BColliders, UColliders;
@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour {
                 hasFalled = true;
             }
         }
-        if (hasFalled && !won)
+        if (hasFalled && !won && transform.tag != "FloatingCube")
         {
             transform.position = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
         }
@@ -443,4 +443,70 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
+    public void MoveUp()
+    {
+        if (transform.tag == "FloatingCube")
+        {
+            foreach (Collider collider in Dcolliders)
+            {
+                if (collider.tag == "Cube" || collider.tag == "Ground")
+                {
+                    StartCoroutine(moveUp());
+                    break;
+                }
+            }
+        }
+    }
+
+    IEnumerator moveUp()
+    {
+        startPos = transform.position;
+        endPos = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+
+        while(transform.position != endPos)
+        {
+            transform.position = Vector3.Lerp(startPos, endPos, t);
+            t += Time.deltaTime * speed;
+            yield return null;
+        }
+        t = 0;
+    }
+
+    public void MoveDown()
+    {
+        if(transform.tag == "FloatingCube")
+        {
+            foreach (Collider collider in Dcolliders)
+            {
+                if (collider.tag == "Cube" || collider.tag == "Ground")
+                {
+                    return;
+                }
+            }
+            StartCoroutine(moveDown());
+        }
+    }
+
+    Vector3 groundPos;
+    IEnumerator moveDown()
+    {
+        startPos = transform.position;
+        if (Physics.Raycast(transform.position, -Vector3.up, out Dhit))
+        {
+            groundPos = new Vector3(Dhit.transform.position.x, Dhit.transform.position.y + 1, Dhit.transform.position.z);
+        }
+        else
+            Debug.Log("No Ground");
+
+        startPos = transform.position;
+        endPos = new Vector3(transform.position.x, groundPos.y, transform.position.z);
+
+        while(transform.position != endPos)
+        {
+            transform.position = Vector3.Lerp(startPos, endPos, t);
+            t += Time.deltaTime * speed;
+            yield return null;
+        }
+        t = 0;
+    }
 }
