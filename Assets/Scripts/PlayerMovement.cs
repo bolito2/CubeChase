@@ -161,7 +161,7 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (collider.transform.tag == "Cube")
             {
-                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                if (Physics.OverlapSphere(new Vector3(transform.position.x + 1, transform.position.y + 1, transform.position.z), 0.2f).Length > 0)
                 {
                     yield break;
                 }
@@ -233,7 +233,7 @@ public class PlayerMovement : MonoBehaviour {
             {
                 endPos.y++;
                 
-                if(Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                if(Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f).Length > 0)
                 {
                     yield break;
                 }
@@ -305,7 +305,7 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (collider.transform.tag == "Cube")
             {
-                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                if (Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z + 1), 0.1f).Length > 0)
                 {
                     yield break;
                 }
@@ -376,7 +376,7 @@ public class PlayerMovement : MonoBehaviour {
             if (collider.transform.tag == "Cube")
             {
 
-                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                if (Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z - 1), 0.2f).Length > 0)
                 {
                     yield break;
                 }
