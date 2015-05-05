@@ -161,6 +161,10 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (collider.transform.tag == "Cube")
             {
+                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                {
+                    yield break;
+                }
                 endPos.y++;
                 foreach(Collider collider2 in UColliders)
                 {
@@ -228,6 +232,12 @@ public class PlayerMovement : MonoBehaviour {
             if (collider.transform.tag == "Cube")
             {
                 endPos.y++;
+                
+                if(Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                {
+                    yield break;
+                }
+
                 foreach (Collider collider2 in UColliders)
                 {
                     if (collider2.transform.tag == "Cube")
@@ -295,6 +305,10 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (collider.transform.tag == "Cube")
             {
+                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                {
+                    yield break;
+                }
                 endPos.y++;
                 foreach (Collider collider2 in UColliders)
                 {
@@ -361,6 +375,11 @@ public class PlayerMovement : MonoBehaviour {
         {
             if (collider.transform.tag == "Cube")
             {
+
+                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f)[0] != null)
+                {
+                    yield break;
+                }
                 endPos.y++;
                 foreach (Collider collider2 in UColliders)
                 {
