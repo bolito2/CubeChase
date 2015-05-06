@@ -7,6 +7,8 @@ public class TouchInput : MonoBehaviour {
     public Vector2 endPos;
     public PlayerMovement[] cubes;
     bool isTouched;
+    public float waitTimeMax;
+    float waitTime;
 
     void Start()
     {
@@ -16,7 +18,7 @@ public class TouchInput : MonoBehaviour {
     void Update()
     {
 
-        if (cubes == null)
+        if (cubes[0] == null)
             cubes = (PlayerMovement[])FindObjectsOfType(typeof(PlayerMovement));
 
         if (Application.isEditor)
@@ -31,9 +33,11 @@ public class TouchInput : MonoBehaviour {
             {
                 endPos = Input.mousePosition;
             }
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && waitTime <= 0)
             {
-              
+
+                waitTime = waitTimeMax;
+
                 if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50 && !isTouched)
                 {
                     foreach (PlayerMovement cube in cubes)
@@ -88,9 +92,11 @@ public class TouchInput : MonoBehaviour {
                 {
                     endPos = touch.position;
                 }
-                if (touch.phase == TouchPhase.Ended)
+                if (touch.phase == TouchPhase.Ended && waitTime <= 0)
                 {
-                    
+
+                    waitTime = waitTimeMax;
+
                     if (startPos.x - endPos.x > 100 && startPos.y - endPos.y < -50 && !isTouched)
                     {
                         foreach (PlayerMovement cube in cubes)
@@ -131,6 +137,7 @@ public class TouchInput : MonoBehaviour {
             }
 
         }
+        waitTime -= Time.deltaTime;
     }
     
 }

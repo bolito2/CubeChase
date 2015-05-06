@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour {
     RaycastHit Dhit;
 
     //Collider Arrays
-    Collider[] Rcolliders, Dcolliders, LColliders, FColliders, BColliders, UColliders;
+    Collider[] Rcolliders, Dcolliders, LColliders, FColliders, BColliders, UColliders = new Collider[3];
 
     void Awake()
     {
@@ -149,38 +149,82 @@ public class PlayerMovement : MonoBehaviour {
 
     }
 
+    public bool isAgainstWall(string direction, GameObject Objective)
+    {
+        switch (direction)
+        {
+            default:
+                {
+                    Debug.LogError("Wrong direction in againstwall");
+                    return false;
+                    break;
+                }
+            case "left":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x - 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                    break;
+                }
+            case "right":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x + 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                    break;
+                }
+            case "forward":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z + 1), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                    break;
+                }
+            case "back":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z - 1), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                    break;
+                }
+        }
+
+    }
+
     IEnumerator MoveRight()
     {
         isMoving = true;
-        if (!canMove)
-        {
-            isMoving = false;
-            yield break;
-        }
+        canMove = true;
         startPos = transform.position;
         endPos = new Vector3(startPos.x + movement, transform.position.y, startPos.z);
         finalRot = Quaternion.Euler(0, 0, -90);
 
         foreach (Collider collider in Rcolliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player")
+            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
             {
-                if (Physics.OverlapSphere(new Vector3(transform.position.x + 1, transform.position.y + 1, transform.position.z), 0.2f).Length > 0)
+
+                if (isAgainstWall("right", gameObject))
                 {
+                    canMove = false;
                     isMoving = false;
                     yield break;
                 }
 
                 if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
                 {
-                    if (collider.GetComponent<PlayerMovement>().isMoving)
+                    if (isAgainstWall("right", collider.transform.gameObject))
                         endPos.y++;
                 }
                 else endPos.y++;
 
                 foreach (Collider collider2 in UColliders)
                 {
-                    if(collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube")
+                    if(collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube" || collider2.transform.tag == "Player" )
                     {
                         endPos.y--;
                         isMoving = false;
@@ -231,6 +275,7 @@ public class PlayerMovement : MonoBehaviour {
             t += Time.deltaTime * speed;
             yield return null;
         }
+        canMove = true;
         isMoving = false;
         t = 0;
     }
@@ -238,41 +283,37 @@ public class PlayerMovement : MonoBehaviour {
     IEnumerator MoveLeft()
     {
         isMoving = true;
-        if (!canMove)
-        {
-            isMoving = false;
-            yield break;
-        }
+        canMove = true;
         startPos = transform.position;
         endPos = new Vector3(startPos.x - movement, transform.position.y, startPos.z);
         finalRot = Quaternion.Euler(0, 0, 90);
 
         foreach (Collider collider in LColliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player")
+            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
             {
-                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
-                {
-                    if (collider.GetComponent<PlayerMovement>().isMoving)
-                        endPos.y++;
-                }
-                else endPos.y++;
 
-                if (Physics.OverlapSphere(new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z), 0.2f).Length > 0)
+                if (isAgainstWall("left", gameObject))
                 {
+                    canMove = false;
                     isMoving = false;
                     yield break;
                 }
-
                 foreach (Collider collider2 in UColliders)
                 {
-                    if (collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube")
+                    if (collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube" || collider2.transform.tag == "Player")
                     {
                         endPos.y--;
                         isMoving = false;
                         yield break;
                     }
                 }
+                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+                {
+                        if (isAgainstWall("left", collider.transform.gameObject))
+                            endPos.y++;
+                }
+                else endPos.y++;
             }
             else
             {
@@ -319,6 +360,7 @@ public class PlayerMovement : MonoBehaviour {
             t += Time.deltaTime * speed;
             yield return null;
         }
+        canMove = true;
         isMoving = false;
         t = 0;
     }
@@ -326,27 +368,24 @@ public class PlayerMovement : MonoBehaviour {
     IEnumerator MoveForward()
     {
         isMoving = true;
-        if (!canMove)
-        {
-            isMoving = false;
-            yield break;
-        }
+        canMove = true;
         startPos = transform.position;
         endPos = new Vector3(startPos.x, transform.position.y, startPos.z + movement);
         finalRot = Quaternion.Euler(90, 0, 0);
 
         foreach (Collider collider in FColliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player")
+            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
             {
-                if (Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z + 1), 0.1f).Length > 0)
+                if (isAgainstWall("forward", gameObject))
                 {
+                    canMove = false;
                     isMoving = false;
                     yield break;
                 }
                 if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
                 {
-                    if (collider.GetComponent<PlayerMovement>().isMoving)
+                    if (isAgainstWall("forward", collider.transform.gameObject))
                         endPos.y++;
                 }
                 else endPos.y++;
@@ -403,6 +442,7 @@ public class PlayerMovement : MonoBehaviour {
             t += Time.deltaTime * speed;
             yield return null;
         }
+        canMove = true;
         isMoving = false;
         t = 0;
     }
@@ -410,11 +450,7 @@ public class PlayerMovement : MonoBehaviour {
     IEnumerator MoveBack()
     {
         isMoving = true;
-        if (!canMove)
-        {
-            isMoving = false;
-            yield break;
-        }
+        canMove = true;
         startPos = transform.position;
         endPos = new Vector3(startPos.x, transform.position.y, startPos.z - movement);
         finalRot = Quaternion.Euler(-90, 0, 0);
@@ -424,14 +460,15 @@ public class PlayerMovement : MonoBehaviour {
             if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
             {
 
-                if (Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z - 1), 0.2f).Length > 0)
+                if (isAgainstWall("back", gameObject))
                 {
                     isMoving = false;
+                    canMove = false;
                     yield break;
                 }
                 if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
                 {
-                    if (collider.GetComponent<PlayerMovement>().isMoving)
+                    if (isAgainstWall("back", collider.transform.gameObject))
                           endPos.y++;        
                 }
                 else endPos.y++;
@@ -486,6 +523,7 @@ public class PlayerMovement : MonoBehaviour {
             t += Time.deltaTime * speed;
             yield return null;
         }
+        canMove = true;
         isMoving = false;
         t = 0;
     }
@@ -505,12 +543,19 @@ public class PlayerMovement : MonoBehaviour {
     {
         if (transform.tag == "FloatingCube")
         {
+            foreach(Collider collider in UColliders)
+            {
+                if (collider.tag == "Cube" || collider.tag == "Ground" || collider.tag == "Player" || transform.tag == "YellowCube")
+                {
+                    return;
+                }
+            }
             foreach (Collider collider in Dcolliders)
             {
                 if (collider.tag == "Cube" || collider.tag == "Ground")
                 {
-                    StartCoroutine(moveUp());
-                    break;
+                        StartCoroutine(moveUp());
+                        break;
                 }
             }
         }
