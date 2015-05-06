@@ -6,16 +6,34 @@ public class LevelEditor : MonoBehaviour {
     Vector3 blockHitPos;
     RaycastHit blockHit;
     public bool isEditing;
+    public Transform Level;
+    public GameObject LevelPrefab;
 
     public GameObject CubePrefab;
 
     void Start()
     {
-        for(int x = -5; x <= 6; x++)
+        GenerateGround();
+    }
+
+    void OnLevelWasLoaded()
+    {
+        GenerateGround();
+    }
+
+    void GenerateGround()
+    {
+        if(Level == null)
+        {
+            GameObject level = Instantiate(LevelPrefab) as GameObject;
+            Level = level.transform;
+        }
+        for (int x = -5; x <= 6; x++)
         {
             for (int z = -5; z <= 6; z++)
             {
-                Instantiate(CubePrefab, new Vector3(x, -1, z), Quaternion.identity);
+                GameObject cube = Instantiate(CubePrefab, new Vector3(x, -1, z), Quaternion.identity) as GameObject;
+                cube.transform.parent = Level;
             }
         }
     }

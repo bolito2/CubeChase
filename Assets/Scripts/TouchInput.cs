@@ -7,7 +7,7 @@ public class TouchInput : MonoBehaviour {
     public Vector2 endPos;
     public PlayerMovement[] cubes;
     bool isTouched;
-    public float waitTimeMax;
+    const float waitTimeMax = 0.37f;
     float waitTime;
 
     void Start()
@@ -19,7 +19,9 @@ public class TouchInput : MonoBehaviour {
     {
 
         if (cubes[0] == null)
+        {
             cubes = (PlayerMovement[])FindObjectsOfType(typeof(PlayerMovement));
+        }
 
         if (Application.isEditor)
         {
