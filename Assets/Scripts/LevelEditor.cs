@@ -6,7 +6,7 @@ public class LevelEditor : MonoBehaviour {
     Vector3 blockHitPos;
     RaycastHit blockHit;
     public bool isEditing;
-    public Transform Level;
+    public static Transform Level;
     public GameObject LevelPrefab;
 
     public GameObject CubePrefab;
