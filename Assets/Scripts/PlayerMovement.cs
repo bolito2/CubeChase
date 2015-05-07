@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour, IPlayer
+{
 
    //Movement
     float t;
@@ -42,23 +43,25 @@ public class PlayerMovement : MonoBehaviour {
 
     public void MovePlayer(string direction)
     {
-        if(direction == "forward")
+        if (!won)
         {
-            StartCoroutine(MoveForward());
+            if (direction == "forward")
+            {
+                StartCoroutine(MoveForward());
+            }
+            if (direction == "back")
+            {
+                StartCoroutine(MoveBack());
+            }
+            if (direction == "right")
+            {
+                StartCoroutine(MoveRight());
+            }
+            if (direction == "left")
+            {
+                StartCoroutine(MoveLeft());
+            }
         }
-        if (direction == "back")
-        {
-            StartCoroutine(MoveBack());
-        }
-        if (direction == "right")
-        {
-            StartCoroutine(MoveRight());
-        }
-        if (direction == "left")
-        {
-            StartCoroutine(MoveLeft());
-        }
-
     }
 
     void FixedUpdate()
@@ -149,6 +152,20 @@ public class PlayerMovement : MonoBehaviour {
 
     }
 
+    public bool isBehindABlock(GameObject gameObject)
+    {
+        bool uIsPlayer;
+        foreach (Collider collider in UColliders)
+        {
+            if (collider.transform.tag == "Cube" || CheckIPlayer.isPlayer(collider, out uIsPlayer))
+            {
+                return true;
+            }
+            else return false;
+        }
+        return false;
+    }
+
     public bool isAgainstWall(string direction, GameObject Objective)
     {
         switch (direction)
@@ -157,39 +174,74 @@ public class PlayerMovement : MonoBehaviour {
                 {
                     Debug.LogError("Wrong direction in againstwall");
                     return false;
-                    break;
                 }
             case "left":
                 {
-                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x - 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0)
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x - 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0 && Physics.OverlapSphere(new Vector3(Objective.transform.position.x - 1, Objective.transform.position.y, Objective.transform.position.z), 0.2f).Length > 0)
                         return true;
                     else
                         return false;
-                    break;
                 }
             case "right":
                 {
-                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x + 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0)
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x + 1, Objective.transform.position.y + 1, Objective.transform.position.z), 0.2f).Length > 0 && Physics.OverlapSphere(new Vector3(Objective.transform.position.x + 1, Objective.transform.position.y, Objective.transform.position.z), 0.2f).Length > 0)
                         return true;
                     else
                         return false;
-                    break;
                 }
             case "forward":
                 {
-                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z + 1), 0.2f).Length > 0)
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z + 1), 0.2f).Length > 0 && Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y, Objective.transform.position.z + 1), 0.2f).Length > 0)
                         return true;
                     else
                         return false;
-                    break;
                 }
             case "back":
                 {
-                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z - 1), 0.2f).Length > 0)
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y + 1, Objective.transform.position.z - 1), 0.2f).Length > 0 && Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y, Objective.transform.position.z - 1), 0.2f).Length > 0)
                         return true;
                     else
                         return false;
-                    break;
+                }
+        }
+    }
+        
+        public bool isAgainstCube(string direction, GameObject Objective)
+    {
+        switch (direction)
+        {
+            default:
+                {
+                    Debug.LogError("Wrong direction in againstwall");
+                    return false;
+                }
+            case "left":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x - 1, Objective.transform.position.y, Objective.transform.position.z), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                }
+            case "right":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x + 1, Objective.transform.position.y, Objective.transform.position.z), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                }
+            case "forward":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y, Objective.transform.position.z + 1), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
+                }
+            case "back":
+                {
+                    if (Physics.OverlapSphere(new Vector3(Objective.transform.position.x, Objective.transform.position.y, Objective.transform.position.z - 1), 0.2f).Length > 0)
+                        return true;
+                    else
+                        return false;
                 }
         }
 
@@ -202,35 +254,35 @@ public class PlayerMovement : MonoBehaviour {
         startPos = transform.position;
         endPos = new Vector3(startPos.x + movement, transform.position.y, startPos.z);
         finalRot = Quaternion.Euler(0, 0, -90);
+        bool isPlayer = false;
 
         foreach (Collider collider in Rcolliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
+            if (collider.transform.tag == "Cube" || CheckIPlayer.isPlayer(collider.GetComponent<PlayerMovement>(), out isPlayer))
             {
 
                 if (isAgainstWall("right", gameObject))
                 {
+                    Debug.Log(gameObject.ToString() + " is against a wall");
                     canMove = false;
                     isMoving = false;
                     yield break;
                 }
 
-                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+                if (isPlayer)
                 {
                     if (isAgainstWall("right", collider.transform.gameObject))
                         endPos.y++;
                 }
                 else endPos.y++;
 
-                foreach (Collider collider2 in UColliders)
-                {
-                    if(collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube" || collider2.transform.tag == "Player" )
-                    {
-                        endPos.y--;
-                        isMoving = false;
-                        yield break;
-                    }
-                }
+                if(isBehindABlock(gameObject) && collider.transform.tag == "Cube")
+                   {
+                    endPos.y--;
+                    isMoving = false;
+                    Debug.Log(gameObject.ToString() + " is behind a block");
+                    yield break;
+                   }
             }
             else
             {
@@ -287,28 +339,28 @@ public class PlayerMovement : MonoBehaviour {
         startPos = transform.position;
         endPos = new Vector3(startPos.x - movement, transform.position.y, startPos.z);
         finalRot = Quaternion.Euler(0, 0, 90);
+        bool isPlayer = false;
 
         foreach (Collider collider in LColliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
+            if (collider.transform.tag == "Cube" || CheckIPlayer.isPlayer(collider.GetComponent<PlayerMovement>(), out isPlayer))
             {
 
                 if (isAgainstWall("left", gameObject))
                 {
+                    Debug.Log(gameObject.ToString() + " is against a wall");
                     canMove = false;
                     isMoving = false;
                     yield break;
                 }
-                foreach (Collider collider2 in UColliders)
-                {
-                    if (collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube" || collider2.transform.tag == "Player")
+                    if (isBehindABlock(gameObject) && collider.transform.tag == "Cube")
                     {
-                        endPos.y--;
-                        isMoving = false;
-                        yield break;
-                    }
+                    endPos.y--;
+                    isMoving = false;
+                    Debug.Log(gameObject.ToString() + " is behind a block");
+                    yield break;
                 }
-                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+                if (isPlayer)
                 {
                         if (isAgainstWall("left", collider.transform.gameObject))
                             endPos.y++;
@@ -372,31 +424,33 @@ public class PlayerMovement : MonoBehaviour {
         startPos = transform.position;
         endPos = new Vector3(startPos.x, transform.position.y, startPos.z + movement);
         finalRot = Quaternion.Euler(90, 0, 0);
+        bool isPlayer = false;
 
         foreach (Collider collider in FColliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || transform.tag == "FloatingCube")
+            if (collider.transform.tag == "Cube" || CheckIPlayer.isPlayer(collider.GetComponent<PlayerMovement>(), out isPlayer))
             {
+
                 if (isAgainstWall("forward", gameObject))
                 {
+                    Debug.Log(gameObject.ToString() + " is against a wall");
                     canMove = false;
                     isMoving = false;
                     yield break;
                 }
-                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+                if (isPlayer)
                 {
                     if (isAgainstWall("forward", collider.transform.gameObject))
                         endPos.y++;
                 }
                 else endPos.y++;
-                foreach (Collider collider2 in UColliders)
+
+                if (isBehindABlock(gameObject) && collider.transform.tag == "Cube")
                 {
-                    if (collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube")
-                    {
-                        endPos.y--;
-                        isMoving = false;
-                        yield break;
-                    }
+                    endPos.y--;
+                    isMoving = false;
+                    Debug.Log(gameObject.ToString() + " is behind a block");
+                    yield break;
                 }
             }
             else
@@ -454,31 +508,33 @@ public class PlayerMovement : MonoBehaviour {
         startPos = transform.position;
         endPos = new Vector3(startPos.x, transform.position.y, startPos.z - movement);
         finalRot = Quaternion.Euler(-90, 0, 0);
+        bool isPlayer = false;
 
         foreach (Collider collider in BColliders)
         {
-            if (collider.transform.tag == "Cube" || collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+            if (collider.transform.tag == "Cube" || CheckIPlayer.isPlayer(collider.GetComponent<PlayerMovement>(), out isPlayer))
             {
 
                 if (isAgainstWall("back", gameObject))
                 {
+                    Debug.Log(gameObject.ToString() + " is against a wall");
                     isMoving = false;
                     canMove = false;
                     yield break;
                 }
-                if (collider.transform.tag == "Player" || collider.transform.tag == "YellowCube" || collider.transform.tag == "FloatingCube")
+                if (isPlayer)
                 {
                     if (isAgainstWall("back", collider.transform.gameObject))
                           endPos.y++;        
                 }
                 else endPos.y++;
-                foreach (Collider collider2 in UColliders)
+
+                if (isBehindABlock(gameObject) && collider.transform.tag == "Cube")
                 {
-                    if (collider2.transform.tag == "Cube" || collider2.transform.tag == "FloatingCube")
-                    {
-                        isMoving = false;
-                        yield break;
-                    }
+                    endPos.y--;
+                    isMoving = false;
+                    Debug.Log(gameObject.ToString() + " is behind a block");
+                    yield break;
                 }
             }
             else
